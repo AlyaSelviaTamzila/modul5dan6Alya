@@ -1,71 +1,61 @@
 <?php
 
+session_start();
+
+if(!isset($_SESSION['user']))
+{
+    header("location: ../login/form-login.php");
+}
+
 include '../connect.php';
 
-$query = "SELECT kode, nama_matkul, sks, semester, id_dosen, nama_dosen
-          FROM matakuliah LEFT JOIN dosen
-          USING (id_dosen)
-          ORDER BY kode";
-
+$query = "SELECT * FROM dosen";
 $result = mysqli_query($connect, $query);
-
 $num = mysqli_num_rows($result);
 
 ?>
 
-
 <!DOCTYPE html>
+<html>
+<body>
 <form action="search.php" method="get">
     <input type="search" name="cari" placeholder="Masukkan pencarian...">
-    <select name="kategori" id="">
-        <option value="nama_matkul">Matakuliah</option>
-        <option value="nama_dosen">Dosen</option>
-        <option value="sks">SKS</option>
-        <option value="semester">Semester</option>
-    </select>
     <input type="submit" value="cari">
 </form>
-    <table border="1">
-        <tr>
-            <th>No.</th>
-            <th>Kode</th>
-            <th>Matakuliah</th>
-            <th>SKS</th>
-            <th>Semester</th>
-            <th>Dosen Pengajar</th>
-            <th>Aksi</th>
-        </tr>
+    <table border = '1'>
+    <h2>Data Dosen</h2>
+    <tr>
+        <th>No.</th>
+        <th>Nama</th>
+        <th>No. Telepon</th>
+        <th>Aksi</th>
+    </tr>
+    
 
     <?php
         if($num > 0){
             $no = 1;
-            while ($data = mysqli_fetch_assoc($result)){?>
-                
-                    <tr>
-                        <td> <?php echo $no; ?> </td>
-                        <td> <?php echo $data['kode'] ?> </td>
-                        <td> <?php echo $data['nama_matkul'] ?> </td>
-                        <td> <?php echo $data['sks'] ?> </td>
-                        <td> <?php echo $data['semester'] ?> </td>
-                        <td> <?php echo $data['id_dosen'] ?> </td>
-                        <td> <?php
-                                if($data['nama_dosen'] != NULL ){
-                                    echo $data['nama_dosen'];
-                                }else{
-                                    echo "NULL";
-                                } 
-                             ?> 
-                        </td>
-                        <td> 
-                            <a href="form-update.php?kode=<?php echo $data['kode']; ?>">Edit</a>
-                            <a href="delete.php?kode=<?php echo $data['kode']; ?>" onclick="return confirm('Anda yakin ingin menghapus data?')"> Hapus </a>
-                        </td>
-                    </tr>
-                <?php
+            while($data = mysqli_fetch_assoc($result)){
+                echo "<tr>";
+                echo "<td>". $no ."</td>";
+                echo "<td>". $data['nama_dosen'] . "</td>";
+                echo "<td>". $data['telp'] . "</td>";
+                echo "<td><a href = 'form-update.php?id_dosen=" . $data['id_dosen'] . "'>Edit<?a> | "; 
+                echo "<td><a href='delete.php?id_dosen=" . $data['id_dosen'] . "'onclick='return confirm(\"Apakah anda yakin untuk menghapus data?\")'>Hapus</a></td>";
+                echo "</tr>";
                 $no++;
             }
         }else{
-            echo "<tr> <td colspan='7'> Tidak ada data </td></tr>";
+            echo "<td colspan = '3'>Tidak ada data</td>";
         }
     ?>
     </table>
+    <form action= "../login/logout.php">
+    <table>
+        <tr>
+        <td><input  type="submit" value="Logout"></td>
+    </table>
+    </form>
+
+</body>
+<html>
